@@ -1,0 +1,17 @@
+[
+  {"question": "What is the refund policy?", "ground_truth_doc": "Refund_Policy.pdf"},
+  {"question": "How many vacation days do I get?", "ground_truth_doc": "HR_Handbook.pdf"},
+  {"question": "What is the company's mission?", "ground_truth_doc": "Mission_Statement.pdf"},
+  {"question": "Who is the CEO?", "ground_truth_doc": "Leadership_Team.pdf"},
+  {"question": "What are the working hours?", "ground_truth_doc": "HR_Handbook.pdf"},
+  {"question": "How do I file an expense report?", "ground_truth_doc": "Finance_Policy.pdf"},
+  {"question": "What is the dress code?", "ground_truth_doc": "HR_Handbook.pdf"},
+  {"question": "What is the product roadmap?", "ground_truth_doc": "Product_Strategy.pdf"},
+  {"question": "How do I reset my password?", "ground_truth_doc": "IT_Policy.pdf"},
+  {"question": "What is the annual leave policy?", "ground_truth_doc": "HR_Handbook.pdf"},
+  {"question": "What are the security protocols?", "ground_truth_doc": "Security_Policy.pdf"},
+  {"question": "How do I submit a timesheet?", "ground_truth_doc": "Finance_Policy.pdf"},
+  {"question": "What is the code of conduct?", "ground_truth_doc": "HR_Handbook.pdf"},
+  {"question": "What is the marketing strategy?", "ground_truth_doc": "Marketing_Plan.pdf"},
+  {"question": "How do I request a new laptop?", "ground_truth_doc": "IT_Policy.pdf"}
+]
