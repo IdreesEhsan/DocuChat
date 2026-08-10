@@ -1,18 +1,17 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
-from ..core.auth import get_current_user
+from ..dependencies import get_current_user
 from ..services.parser import parse_file
 from ..services.chunker import chunk_document
 from ..services.embedder import batch_embed
-from ..core.supabase import supabase
-from ..models.schemas import UploadResponse
+from ..services.db_service import supabase
 import uuid
 
-router = APIRouter(prefix="/upload", tags=["Upload"])
+router = APIRouter(prefix="/upload", tags=["upload"])
 
-@router.post("/", response_model=UploadResponse)
+@router.post("/")
 async def upload_document(
     file: UploadFile = File(...),
-    current_user: dict = Depends(get_current_user)   # <-- Protected
+    current_user = Depends(get_current_user)
 ):
     try:
         raw_text, meta = await parse_file(file)
@@ -25,7 +24,7 @@ async def upload_document(
         for chunk, emb in zip(chunks, embeddings):
             rows.append({
                 "id": str(uuid.uuid4()),
-                "user_id": current_user["id"],     # <-- Scope to user
+                "user_id": current_user.id,          # Supabase user ID
                 "chunk_text": chunk["text"],
                 "metadata": chunk["metadata"],
                 "embedding": emb
@@ -33,6 +32,6 @@ async def upload_document(
         
         supabase.table("documents").insert(rows).execute()
         
-        return UploadResponse(status="success", chunks_stored=len(rows), filename=file.filename)
+        return {"status": "success", "chunks_stored": len(rows), "filename": file.filename}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
