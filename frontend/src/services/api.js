@@ -1,12 +1,11 @@
 import axios from 'axios';
 
-// Setup default base URL (Vite proxy will handle)
 const API = axios.create({ baseURL: '' });
 
-// Add token to every request
+// Interceptor to add token from localStorage to every request
 API.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('access_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -15,6 +14,16 @@ API.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+export const registerAPI = async (userData) => {
+  const response = await API.post('/api/auth/register', userData);
+  return response.data;
+};
+
+export const loginAPI = async (email, password) => {
+  const response = await API.post('/api/auth/login', { email, password });
+  return response.data;
+};
+
 export const uploadFile = (file) => {
   const formData = new FormData();
   formData.append('file', file);
@@ -22,12 +31,11 @@ export const uploadFile = (file) => {
 };
 
 export const streamChat = async (query, onEvent) => {
-  const token = localStorage.getItem('token');
   const response = await fetch('/chat/stream', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      'Authorization': `Bearer ${localStorage.getItem('access_token')}`
     },
     body: JSON.stringify({ query }),
   });
