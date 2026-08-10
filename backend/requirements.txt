@@ -10,6 +10,3 @@ pydantic-settings
 httpx
 python-multipart
 tiktoken
-python-jose[cryptography]   # JWT
-passlib[bcrypt]             # password hashing
-email-validator             # email validation
