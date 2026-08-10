@@ -1,6 +1,19 @@
 import axios from 'axios';
 
+// Setup default base URL (Vite proxy will handle)
 const API = axios.create({ baseURL: '' });
+
+// Add token to every request
+API.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 export const uploadFile = (file) => {
   const formData = new FormData();
@@ -9,9 +22,13 @@ export const uploadFile = (file) => {
 };
 
 export const streamChat = async (query, onEvent) => {
+  const token = localStorage.getItem('token');
   const response = await fetch('/chat/stream', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
     body: JSON.stringify({ query }),
   });
   const reader = response.body.getReader();
