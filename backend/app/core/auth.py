@@ -1,13 +1,11 @@
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
-from passlib.context import CryptoContext
-from fastapi import HTTPException, Security
+from passlib.context import CryptContext
+from fastapi import HTTPException, Security, Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from .config import settings
-import uuid
 
-# Configure password hashing
-pwd_context = CryptoContext(schemas=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")   # <-- Fixed
 
 def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
@@ -17,7 +15,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 SECRET_KEY = settings.jwt_secret_key
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7
 
 def create_access_token(data: dict) -> str:
     to_encode = data.copy()
