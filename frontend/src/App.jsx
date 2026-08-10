@@ -1,27 +1,44 @@
-import React, { useState } from 'react';
-import { useAuth } from './contexts/AuthContext';
-import Login from './components/Login';
+import React, { useState, useEffect } from 'react';
+import AuthView from './components/AuthView';
 import UploadArea from './components/UploadArea';
 import ChatInterface from './components/ChatInterface';
 
 function App() {
-  const { user, loading, logout } = useAuth();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [docUploaded, setDocUploaded] = useState(false);
   const [uploadStatus, setUploadStatus] = useState('');
+
+  useEffect(() => {
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  const handleLoginSuccess = () => {
+    setIsAuthenticated(true);
+  };
 
   const handleUploadComplete = (data) => {
     setDocUploaded(true);
     setUploadStatus(`✅ Uploaded ${data.filename} — ${data.chunks_stored} chunks stored.`);
   };
 
-  if (loading) return <div style={{ textAlign: 'center', marginTop: 50 }}>Loading...</div>;
-  if (!user) return <Login />;
+  if (!isAuthenticated) {
+    return <AuthView onLoginSuccess={handleLoginSuccess} />;
+  }
 
   return (
     <div style={{ maxWidth: 800, margin: '40px auto', padding: '0 20px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h1 style={{ fontSize: 36 }}>📄 DocuChat</h1>
-        <button onClick={logout} style={{ padding: '8px 16px', background: '#dc3545', color: 'white', border: 'none', borderRadius: 4, cursor: 'pointer' }}>
+        <button
+          onClick={() => {
+            localStorage.removeItem('access_token');
+            setIsAuthenticated(false);
+          }}
+          style={{ padding: '8px 16px', background: '#dc3545', color: 'white', border: 'none', borderRadius: 4, cursor: 'pointer' }}
+        >
           Logout
         </button>
       </div>
