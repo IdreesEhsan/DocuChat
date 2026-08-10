@@ -1,25 +1,20 @@
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
-from ..core.auth import get_current_user
+from ..dependencies import get_current_user
 from ..services.llm import call_llm_with_retry
 import json
 
-router = APIRouter(prefix="/extract", tags=["Extraction"])
+router = APIRouter(prefix="/extract", tags=["extract"])
 
 class ExtractRequest(BaseModel):
     text: str
-    schema_description: str  # e.g., "Extract name, email, phone, skills as array"
+    schema_description: str
 
-class ExtractResponse(BaseModel):
-    extracted: dict
-    tokens_used: int
-
-@router.post("/", response_model=ExtractResponse)
+@router.post("/")
 async def extract_structured(
     req: ExtractRequest,
-    current_user: dict = Depends(get_current_user)   # <-- Protected
+    current_user = Depends(get_current_user)
 ):
-    # Load extraction prompt
     with open("prompts/extract_system.txt", "r") as f:
         system_prompt = f.read()
     system_prompt = system_prompt.replace("{{SCHEMA}}", req.schema_description)
@@ -32,9 +27,6 @@ async def extract_structured(
     try:
         response = await call_llm_with_retry(messages, temperature=0.1, max_tokens=500)
         extracted = json.loads(response)
-        tokens_used = len(response.split())  # approximate
-        return ExtractResponse(extracted=extracted, tokens_used=tokens_used)
-    except json.JSONDecodeError:
-        raise HTTPException(status_code=400, detail="LLM returned invalid JSON")
+        return {"extracted": extracted}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Extraction failed: {str(e)}")
