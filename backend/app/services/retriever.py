@@ -1,10 +1,10 @@
-from ..core.supabase import supabase
+from ..services.db_service import supabase
 from .embedder import get_embedding
 
-def hybrid_retrieve(query: str, user_id: str, top_k: int = 5) -> list[dict]:
+def hybrid_retrieve(query: str, user_id: str, top_k: int = 5):
     query_emb = get_embedding(query)
     
-    # Vector search – returns all results, we filter by user_id below
+    # Vector search via RPC (returns all, we filter by user_id)
     vector_results = supabase.rpc(
         "match_documents",
         {"query_embedding": query_emb, "match_threshold": 0.72, "match_count": top_k}
